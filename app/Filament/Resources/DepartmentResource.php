@@ -3,20 +3,17 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DepartmentResource\Pages;
-use App\Filament\Resources\DepartmentResource\RelationManagers;
 use App\Models\Department;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DepartmentResource extends Resource
 {
     protected static ?string $model = Department::class;
-
+    protected static ?string $navigationGroup = 'Resources';
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
     public static function form(Form $form): Form
@@ -34,6 +31,7 @@ class DepartmentResource extends Resource
                 ->maxLength(100),
             Forms\Components\Textarea::make('description')
                 ->columnSpanFull(),
+            Forms\Components\Toggle::make('active'),
         ];
     }
 
@@ -43,6 +41,11 @@ class DepartmentResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                Tables\Columns\ToggleColumn::make('active'),
+                // Tables\Columns\TextColumn::make('active')
+                //     ->badge()
+                // ->formatStateUsing(fn ($state) => $state === 1 ? 'Active' : 'Inactive')
+                // ->color(fn ($state) => $state === 1 ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -53,7 +56,7 @@ class DepartmentResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\TernaryFilter::make('active')->boolean(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
